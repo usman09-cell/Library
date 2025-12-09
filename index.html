@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxRead | Premium Digital Library</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+
+        :root {
+            --primary: #2c1810;
+            --secondary: #d4af37;
+            --accent: #8b4513;
+            --light: #f8f5f0;
+            --dark: #1a1209;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 36px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--secondary);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* Admin Login */
+        .admin-login-btn {
+            background-color: var(--secondary);
+            color: var(--primary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-login-btn:hover {
+            background-color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 40px 0;
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Book Library */
+        .section-title {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        .book-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .book-cover {
+            height: 320px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .book-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44, 24, 16, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .book-card:hover .book-overlay {
+            opacity: 1;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            color: var(--primary);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: white;
+            transform: scale(1.1);
+        }
+
+        .book-info {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-title {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .book-author {
+            color: var(--accent);
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* Reader View */
+        .reader-container {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-top: 30px;
+        }
+
+        .reader-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reader-title {
+            font-size: 24px;
+        }
+
+        .reader-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .control-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 18px;
+        }
+
+        .control-btn:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .reader-content {
+            padding: 40px;
+            max-height: 600px;
+            overflow-y: auto;
+            line-height: 1.8;
+            font-size: 18px;
+            column-count: 2;
+            column-gap: 40px;
+        }
+
+        .reader-content p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        .tts-controls {
+            background-color: #f9f7f2;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .tts-btn {
+            background-color: var(--secondary);
+            color: var(--primary);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .tts-btn:hover {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        .tts-select {
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+            background-color: white;
+            color: var(--primary);
+        }
+
+        /* Admin Section */
+        .admin-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            display: none;
+            margin-top: 30px;
+        }
+
+        .admin-title {
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .admin-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e6e0d8;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: #fcfbf9;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        textarea {
+            min-height: 250px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        .btn-secondary {
+            background-color: #e6e0d8;
+            color: var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d4c8b8;
+        }
+
+        /* Login Modal */
+        .login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-content {
+            background-color: white;
+            padding: 50px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-title {
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 25px;
+            border: 2px solid #e6e0d8;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background-color: var(--secondary);
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: var(--primary);
+            color: var(--secondary);
+        }
+
+        .login-error {
+            color: #dc3545;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+
+        .footer-section p {
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            background-color: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: var(--secondary);
+            color: var(--primary);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .reader-content {
+                column-count: 1;
+            }
+            
+            .admin-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+            
+            .form-actions {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .book-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .reader-header {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .mobile-nav {
+                display: none;
+                width: 100%;
+                margin-top: 20px;
+            }
+            
+            .mobile-nav.active {
+                display: block;
+            }
+            
+            .mobile-nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-login-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .book-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .reader-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .tts-controls {
+                flex-direction: column;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .login-content {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="login-content">
+            <h2 class="login-title">Admin Login</h2>
+            <input type="password" id="adminPassword" class="login-input" placeholder="Enter admin password" autocomplete="off">
+            <button class="login-btn" id="loginBtn">
+                <i class="fas fa-lock"></i> Login
+            </button>
+            <div class="login-error" id="loginError">
+                Incorrect password. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-book-open"></i>
+                    <span>LuxRead</span>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <nav class="mobile-nav" id="mobileNav">
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-view="library">Library</a></li>
+                        <li><button class="admin-login-btn" id="adminLoginBtnHeader">
+                            <i class="fas fa-user-cog"></i> Admin Login
+                        </button></li>
+                    </ul>
+                </nav>
+                
+                <button class="admin-login-btn desktop-only" id="adminLoginBtn">
+                    <i class="fas fa-user-cog"></i> Admin Login
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Book Library Section -->
+        <section id="libraryView">
+            <h2 class="section-title">Digital Library Collection</h2>
+            
+            <div class="book-grid" id="bookGrid">
+                <!-- Books will be dynamically added here -->
+            </div>
+        </section>
+
+        <!-- Book Reader Section -->
+        <section id="readerView" class="reader-container">
+            <div class="reader-header">
+                <div>
+                    <h2 class="reader-title" id="readerBookTitle">Book Title</h2>
+                    <p id="readerBookAuthor">Author Name</p>
+                </div>
+                <div class="reader-controls">
+                    <button class="control-btn" id="fontSmallerBtn">A-</button>
+                    <button class="control-btn" id="fontNormalBtn">A</button>
+                    <button class="control-btn" id="fontLargerBtn">A+</button>
+                    <button class="control-btn" id="closeReaderBtn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="reader-content" id="readerContent">
+                <!-- Book content will be loaded here -->
+            </div>
+            
+            <div class="tts-controls">
+                <select class="tts-select" id="voiceSelect">
+                    <option value="">Select Voice</option>
+                </select>
+                <button class="tts-btn" id="playTtsBtn">
+                    <i class="fas fa-play"></i> Listen to Book
+                </button>
+                <button class="tts-btn" id="pauseTtsBtn" style="display: none;">
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button class="tts-btn" id="stopTtsBtn">
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+                <div id="ttsStatus">Ready to listen</div>
+            </div>
+        </section>
+
+        <!-- Admin Section -->
+        <section id="adminView" class="admin-section">
+            <div class="admin-header">
+                <h2 class="admin-title">
+                    <i class="fas fa-user-cog"></i> Admin Panel
+                    <button class="admin-login-btn" id="logoutBtn" style="margin-left: auto; background-color: #e74c3c; color: white;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </h2>
+            </div>
+            
+            <form class="admin-form" id="adminForm">
+                <div class="form-group">
+                    <label for="bookTitle">Book Title</label>
+                    <input type="text" id="bookTitle" required placeholder="Enter book title">
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookAuthor">Author</label>
+                    <input type="text" id="bookAuthor" required placeholder="Enter author name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="bookCover">Cover Image URL</label>
+                    <input type="url" id="bookCover" required placeholder="https://example.com/cover.jpg">
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="bookContent">Book Content (Text)</label>
+                    <textarea id="bookContent" required placeholder="Paste the full book text here..."></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelAdminBtn">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Book to Library
+                    </button>
+                </div>
+            </form>
+            
+            <div style="margin-top: 40px;">
+                <h3 style="color: var(--primary); margin-bottom: 20px;">Existing Books (Click to delete)</h3>
+                <div id="bookListAdmin"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>LuxRead</h3>
+                    <p>Experience reading in its most elegant form. Our premium digital library brings classic and contemporary literature to your fingertips.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Features</h3>
+                    <ul style="list-style: none; opacity: 0.8;">
+                        <li><i class="fas fa-check" style="color: var(--secondary); margin-right: 10px;"></i> Premium Book Collection</li>
+                        <li><i class="fas fa-check" style="color: var(--secondary); margin-right: 10px;"></i> Text-to-Speech Technology</li>
+                        <li><i class="fas fa-check" style="color: var(--secondary); margin-right: 10px;"></i> Responsive Reading Experience</li>
+                        <li><i class="fas fa-check" style="color: var(--secondary); margin-right: 10px;"></i> Secure Admin Access</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p><i class="fas fa-envelope" style="color: var(--secondary); margin-right: 10px;"></i> support@luxread.com</p>
+                    <p><i class="fas fa-phone" style="color: var(--secondary); margin-right: 10px;"></i> +1 (555) 123-4567</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                &copy; 2023 LuxRead Digital Library. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const libraryView = document.getElementById('libraryView');
+            const readerView = document.getElementById('readerView');
+            const adminView = document.getElementById('adminView');
+            const bookGrid = document.getElementById('bookGrid');
+            const adminForm = document.getElementById('adminForm');
+            const readerContent = document.getElementById('readerContent');
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileNav = document.getElementById('mobileNav');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const bookListAdmin = document.getElementById('bookListAdmin');
+            const loginModal = document.getElementById('loginModal');
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            const adminLoginBtnHeader = document.getElementById('adminLoginBtnHeader');
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const adminPassword = document.getElementById('adminPassword');
+            const loginError = document.getElementById('loginError');
+            
+            // TTS Elements
+            const voiceSelect = document.getElementById('voiceSelect');
+            const playTtsBtn = document.getElementById('playTtsBtn');
+            const pauseTtsBtn = document.getElementById('pauseTtsBtn');
+            const stopTtsBtn = document.getElementById('stopTtsBtn');
+            const ttsStatus = document.getElementById('ttsStatus');
+            
+            // State variables
+            let currentBook = null;
+            let speechSynthesis = window.speechSynthesis;
+            let currentUtterance = null;
+            let voices = [];
+            let books = [];
+            let isAdmin = false;
+            
+            // ADMIN PASSWORD - Change this to your desired password
+            const ADMIN_PASSWORD = "luxread2023";
+            
+            // Sample books data
+            const sampleBooks = [
+                {
+                    id: 1,
+                    title: "Pride and Prejudice",
+                    author: "Jane Austen",
+                    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    content: "It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife. However little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so well fixed in the minds of the surrounding families, that he is considered the rightful property of some one or other of their daughters..."
+                },
+                {
+                    id: 2,
+                    title: "The Great Gatsby",
+                    author: "F. Scott Fitzgerald",
+                    cover: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    content: "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since. 'Whenever you feel like criticizing any one,' he told me, 'just remember that all the people in this world haven't had the advantages that you've had.'..."
+                },
+                {
+                    id: 3,
+                    title: "Moby Dick",
+                    author: "Herman Melville",
+                    cover: "https://images.unsplash.com/photo-1507919909716-c8262b4e3f26?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                    content: "Call me Ishmael. Some years ago—never mind how long precisely—having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen and regulating the circulation..."
+                }
+            ];
+            
+            // Initialize app
+            function initApp() {
+                loadBooks();
+                renderBooks();
+                loadVoices();
+                setupEventListeners();
+                checkAdminSession();
+                
+                // Show library view by default
+                showView('library');
+            }
+            
+            // Load books from localStorage or use sample books
+            function loadBooks() {
+                const savedBooks = localStorage.getItem('luxread_books');
+                if (savedBooks) {
+                    books = JSON.parse(savedBooks);
+                } else {
+                    books = [...sampleBooks];
+                    saveBooks();
+                }
+            }
+            
+            // Save books to localStorage
+            function saveBooks() {
+                localStorage.setItem('luxread_books', JSON.stringify(books));
+            }
+            
+            // Check if admin is logged in from sessionStorage
+            function checkAdminSession() {
+                const adminSession = sessionStorage.getItem('luxread_admin');
+                if (adminSession === 'true') {
+                    isAdmin = true;
+                    updateAdminUI();
+                }
+            }
+            
+            // Update admin UI elements
+            function updateAdminUI() {
+                // Update admin button text
+                const adminButtons = document.querySelectorAll('.admin-login-btn');
+                adminButtons.forEach(btn => {
+                    if (isAdmin) {
+                        btn.innerHTML = '<i class="fas fa-user-cog"></i> Admin Panel';
+                        btn.onclick = () => showView('admin');
+                    } else {
+                        btn.innerHTML = '<i class="fas fa-user-cog"></i> Admin Login';
+                        btn.onclick = () => showLoginModal();
+                    }
+                });
+            }
+            
+            // Render books to the library
+            function renderBooks() {
+                bookGrid.innerHTML = '';
+                
+                books.forEach(book => {
+                    const bookCard = document.createElement('div');
+                    bookCard.className = 'book-card';
+                    bookCard.innerHTML = `
+                        <div class="book-cover" style="background-image: url('${book.cover}')">
+                            <div class="book-overlay">
+                                <div class="book-actions">
+                                    <button class="action-btn read-btn" data-id="${book.id}">
+                                        <i class="fas fa-book-open"></i>
+                                    </button>
+                                    <button class="action-btn listen-btn" data-id="${book.id}">
+                                        <i class="fas fa-headphones"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3 class="book-title">${book.title}</h3>
+                            <p class="book-author">by ${book.author}</p>
+                            <div class="book-meta">
+                                <span><i class="fas fa-book"></i> ${book.content.length > 500 ? "Long read" : "Short read"}</span>
+                                <span><i class="fas fa-clock"></i> ${Math.ceil(book.content.length / 1000)} min</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    bookGrid.appendChild(bookCard);
+                });
+                
+                // Render books in admin panel if admin is logged in
+                if (isAdmin) {
+                    renderAdminBookList();
+                }
+            }
+            
+            // Render books in admin panel for deletion
+            function renderAdminBookList() {
+                bookListAdmin.innerHTML = '';
+                
+                books.forEach(book => {
+                    const bookItem = document.createElement('div');
+                    bookItem.className = 'book-card';
+                    bookItem.style.marginBottom = '15px';
+                    bookItem.style.cursor = 'pointer';
+                    bookItem.innerHTML = `
+                        <div style="padding: 15px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <strong>${book.title}</strong> by ${book.author}
+                            </div>
+                            <button class="action-btn delete-book-btn" data-id="${book.id}" style="background-color: #ff6b6b; color: white;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    bookListAdmin.appendChild(bookItem);
+                });
+            }
+            
+            // Load available TTS voices
+            function loadVoices() {
+                // Chrome loads voices asynchronously
+                voices = speechSynthesis.getVoices();
+                
+                if (voices.length === 0) {
+                    speechSynthesis.addEventListener('voiceschanged', function() {
+                        voices = speechSynthesis.getVoices();
+                        populateVoiceList();
+                    });
+                } else {
+                    populateVoiceList();
+                }
+            }
+            
+            // Populate voice selection dropdown
+            function populateVoiceList() {
+                voiceSelect.innerHTML = '<option value="">Select Voice</option>';
+                
+                voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                });
+            }
+            
+            // Show a specific view (library, reader, admin)
+            function showView(view) {
+                // Only show admin view if user is logged in as admin
+                if (view === 'admin' && !isAdmin) {
+                    showLoginModal();
+                    return;
+                }
+                
+                libraryView.style.display = view === 'library' ? 'block' : 'none';
+                readerView.style.display = view === 'reader' ? 'block' : 'none';
+                adminView.style.display = view === 'admin' ? 'block' : 'none';
+                
+                // Update nav links
+                navLinks.forEach(link => {
+                    if (link.dataset.view === view) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                
+                // Close mobile menu
+                mobileNav.classList.remove('active');
+            }
+            
+            // Show login modal
+            function showLoginModal() {
+                loginModal.style.display = 'flex';
+                adminPassword.focus();
+                loginError.style.display = 'none';
+                adminPassword.value = '';
+            }
+            
+            // Hide login modal
+            function hideLoginModal() {
+                loginModal.style.display = 'none';
+            }
+            
+            // Login function
+            function login() {
+                const password = adminPassword.value.trim();
+                
+                if (password === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    sessionStorage.setItem('luxread_admin', 'true');
+                    updateAdminUI();
+                    hideLoginModal();
+                    showView('admin');
+                } else {
+                    loginError.style.display = 'block';
+                    adminPassword.focus();
+                    adminPassword.value = '';
+                }
+            }
+            
+            // Logout function
+            function logout() {
+                isAdmin = false;
+                sessionStorage.removeItem('luxread_admin');
+                updateAdminUI();
+                showView('library');
+            }
+            
+            // Open book for reading
+            function openBook(bookId) {
+                const book = books.find(b => b.id === bookId);
+                if (!book) return;
+                
+                currentBook = book;
+                
+                // Update reader view
+                document.getElementById('readerBookTitle').textContent = book.title;
+                document.getElementById('readerBookAuthor').textContent = `by ${book.author}`;
+                readerContent.innerHTML = `<p>${book.content.replace(/\n/g, '</p><p>')}</p>`;
+                
+                // Reset font size
+                readerContent.style.fontSize = '18px';
+                
+                // Stop any ongoing TTS
+                stopTts();
+                
+                // Show reader view
+                showView('reader');
+            }
+            
+            // Start text-to-speech
+            function startTts() {
+                if (!currentBook) return;
+                
+                stopTts(); // Stop any ongoing speech
+                
+                const text = currentBook.content;
+                const selectedVoice = voiceSelect.value;
+                
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                
+                // Set voice if selected
+                if (selectedVoice) {
+                    const voice = voices.find(v => v.name === selectedVoice);
+                    if (voice) currentUtterance.voice = voice;
+                }
+                
+                // Set speech properties
+                currentUtterance.rate = 0.9;
+                currentUtterance.pitch = 1;
+                currentUtterance.volume = 1;
+                
+                // Update UI during speech
+                currentUtterance.onstart = function() {
+                    ttsStatus.textContent = 'Reading...';
+                    playTtsBtn.style.display = 'none';
+                    pauseTtsBtn.style.display = 'flex';
+                };
+                
+                currentUtterance.onend = function() {
+                    ttsStatus.textContent = 'Finished reading';
+                    playTtsBtn.style.display = 'flex';
+                    pauseTtsBtn.style.display = 'none';
+                };
+                
+                currentUtterance.onerror = function(event) {
+                    ttsStatus.textContent = 'Error: ' + event.error;
+                    playTtsBtn.style.display = 'flex';
+                    pauseTtsBtn.style.display = 'none';
+                };
+                
+                // Start speech
+                speechSynthesis.speak(currentUtterance);
+            }
+            
+            // Pause TTS
+            function pauseTts() {
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.pause();
+                    ttsStatus.textContent = 'Paused';
+                    pauseTtsBtn.style.display = 'none';
+                    playTtsBtn.style.display = 'flex';
+                }
+            }
+            
+            // Resume TTS
+            function resumeTts() {
+                if (speechSynthesis.paused) {
+                    speechSynthesis.resume();
+                    ttsStatus.textContent = 'Reading...';
+                    playTtsBtn.style.display = 'none';
+                    pauseTtsBtn.style.display = 'flex';
+                }
+            }
+            
+            // Stop TTS
+            function stopTts() {
+                if (speechSynthesis.speaking || speechSynthesis.paused) {
+                    speechSynthesis.cancel();
+                    ttsStatus.textContent = 'Stopped';
+                    playTtsBtn.style.display = 'flex';
+                    pauseTtsBtn.style.display = 'none';
+                }
+            }
+            
+            // Add new book (admin only)
+            function addBook(title, author, cover, content) {
+                if (!isAdmin) {
+                    alert('You must be logged in as admin to add books.');
+                    showLoginModal();
+                    return;
+                }
+                
+                const newBook = {
+                    id: Date.now(), // Simple unique ID
+                    title,
+                    author,
+                    cover,
+                    content
+                };
+                
+                books.push(newBook);
+                saveBooks();
+                renderBooks();
+                
+                // Clear form
+                adminForm.reset();
+                
+                // Show success message
+                alert('Book added successfully!');
+            }
+            
+            // Delete book (admin only)
+            function deleteBook(bookId) {
+                if (!isAdmin) {
+                    alert('You must be logged in as admin to delete books.');
+                    showLoginModal();
+                    return;
+                }
+                
+                if (confirm('Are you sure you want to delete this book?')) {
+                    books = books.filter(book => book.id !== bookId);
+                    saveBooks();
+                    renderBooks();
+                    
+                    // If we're currently reading the deleted book, close reader
+                    if (currentBook && currentBook.id === bookId) {
+                        showView('library');
+                        currentBook = null;
+                    }
+                }
+            }
+            
+            // Setup event listeners
+            function setupEventListeners() {
+                // Mobile menu toggle
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileNav.classList.toggle('active');
+                });
+                
+                // Navigation links
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const view = this.dataset.view;
+                        showView(view);
+                    });
+                });
+                
+                // Admin login buttons
+                adminLoginBtn.addEventListener('click', showLoginModal);
+                adminLoginBtnHeader.addEventListener('click', showLoginModal);
+                
+                // Login button
+                loginBtn.addEventListener('click', login);
+                
+                // Press Enter to login
+                adminPassword.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        login();
+                    }
+                });
+                
+                // Logout button
+                logoutBtn.addEventListener('click', logout);
+                
+                // Cancel admin button
+                document.getElementById('cancelAdminBtn').addEventListener('click', function() {
+                    showView('library');
+                });
+                
+                // Close reader button
+                document.getElementById('closeReaderBtn').addEventListener('click', function() {
+                    showView('library');
+                    stopTts();
+                });
+                
+                // Book grid event delegation (for read and listen buttons)
+                bookGrid.addEventListener('click', function(e) {
+                    const readBtn = e.target.closest('.read-btn');
+                    const listenBtn = e.target.closest('.listen-btn');
+                    
+                    if (readBtn) {
+                        const bookId = parseInt(readBtn.dataset.id);
+                        openBook(bookId);
+                    }
+                    
+                    if (listenBtn) {
+                        const bookId = parseInt(listenBtn.dataset.id);
+                        openBook(bookId);
+                        // Small delay to ensure reader is open
+                        setTimeout(() => {
+                            startTts();
+                        }, 500);
+                    }
+                });
+                
+                // Admin form submission
+                adminForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const title = document.getElementById('bookTitle').value;
+                    const author = document.getElementById('bookAuthor').value;
+                    const cover = document.getElementById('bookCover').value;
+                    const content = document.getElementById('bookContent').value;
+                    
+                    addBook(title, author, cover, content);
+                });
+                
+                // Admin book list for deletion
+                bookListAdmin.addEventListener('click', function(e) {
+                    const deleteBtn = e.target.closest('.delete-book-btn');
+                    if (deleteBtn) {
+                        const bookId = parseInt(deleteBtn.dataset.id);
+                        deleteBook(bookId);
+                    }
+                });
+                
+                // Reader controls
+                document.getElementById('fontSmallerBtn').addEventListener('click', function() {
+                    const currentSize = parseInt(window.getComputedStyle(readerContent).fontSize);
+                    readerContent.style.fontSize = (currentSize - 2) + 'px';
+                });
+                
+                document.getElementById('fontNormalBtn').addEventListener('click', function() {
+                    readerContent.style.fontSize = '18px';
+                });
+                
+                document.getElementById('fontLargerBtn').addEventListener('click', function() {
+                    const currentSize = parseInt(window.getComputedStyle(readerContent).fontSize);
+                    readerContent.style.fontSize = (currentSize + 2) + 'px';
+                });
+                
+                // TTS controls
+                playTtsBtn.addEventListener('click', function() {
+                    if (speechSynthesis.paused) {
+                        resumeTts();
+                    } else {
+                        startTts();
+                    }
+                });
+                
+                pauseTtsBtn.addEventListener('click', pauseTts);
+                stopTtsBtn.addEventListener('click', stopTts);
+                
+                // Close modal when clicking outside
+                loginModal.addEventListener('click', function(e) {
+                    if (e.target === loginModal) {
+                        hideLoginModal();
+                    }
+                });
+            }
+            
+            // Initialize the app
+            initApp();
+        });
+    </script>
+</body>
+</html>
